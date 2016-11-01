@@ -2,13 +2,13 @@
 
 \usepackage{amsmath}
 \usepackage{textcomp}
-
+\usepackage[margin=2.5cm]{geometry}
 % Add other packages here %
 
 
 % Put your group number and names in the author field %
-\title{\bf Excercise 4\\ Implementing a centralized agent}
-\author{Group \textnumero : Student 1, Student 2}
+\title{\bf Exercise 4\\ Implementing a centralized agent}
+\author{Group 39 : Hugo Bonnome, Pedro Amorim}
 
 
 % N.B.: The report should not be longer than 3 pages %
@@ -18,16 +18,48 @@
 \maketitle
 
 \section{Solution Representation}
+Unless noted otherwise, values that are not defined explicitely here use the
+definitions provided in the reference paper. 
 
 \subsection{Variables}
 % Describe the variables used in your solution representation %
+The following variables are used to define the CSP:
+\begin{itemize}
+\item $P$ - a set of plans, one for each vehicle.
+  $$P = \{p_1, p_2,\cdots, p_{N_V}\}$$
+\item $p_i$ - a doubly linked list representing the sequence of actions in a
+  particular plan i.e. the deliveries and pickups that the vehicle should
+  execute.
+  $$p_i = (u_1 \rightarrow u_2 \rightarrow d_2 \rightarrow \cdots | u_i \in U
+  \wedge d_i \in D)$$
+\item $U$ - the set of pickups associated to each task.
+  $$U = \{u_1, u_2, \cdots, u_{N_T}\}$$
+\item $D$ - the set of deliveries associated to each task.
+  $$D = \{d_1, d_2, \cdots, d_{N_T}\}$$
+\end{itemize}
 
 \subsection{Constraints}
 % Describe the constraints in your solution representation %
+\begin{enumerate}
+\item All tasks must be delivered i.e. $p_1 \cup p_2 \cup \cdots \cup p_{N_V} = U
+  \cup D$ 
+\item Max load of a given plan must be under the carrying capacity of the
+  vehicle i.e. $maxLoad(p_i) \leq maxCapacity(v_i)\  \forall_{p_i \in P}$
+\item A plan can only deliver a task it has previously picked up i.e. $u_i \in
+  predecessors(d_i)\ \forall_{u_i, d_i \in p_i}$
+\item A given action can only appear once in the set of all the plans.
+\item If there is a pickup action in a plan then there is a corresponding
+delivery action in the same plan and vice versa. i.e. $u_i \in p_i
+\leftrightarrow d_i \in p_i \ \forall_{p_i \in P,\  u_i \in p_i,\  d_i \in p_i}$
+\end{enumerate}
 
 \subsection{Objective function}
 % Describe the function that you optimize %
-
+Let us first define the total cost of a vehicle $v$ with a given plan. $$c_v =
+\sum_{a_i \in p_v} (dist(a_i))\cdot cost(v)$$
+The total cost of the company is then defined by the sum of the costs of each
+vehicle in the company i.e.
+$$\sum_{v_i \in V} c_{v_i}$$
 
 \section{Stochastic optimization}
 
