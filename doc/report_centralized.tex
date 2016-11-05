@@ -5,7 +5,6 @@
 \usepackage[margin=2.5cm]{geometry}
 % Add other packages here %
 
-
 % Put your group number and names in the author field %
 \title{\bf Exercise 4\\ Implementing a centralized agent}
 \author{Group 39 : Hugo Bonnome, Pedro Amorim}
@@ -49,7 +48,7 @@ The following variables are used to define the CSP:
   predecessors(d_i)\ \forall_{u_i, d_i \in p_i}$
 \item A given action can only appear once in the set of all the plans.
 \item If there is a pickup action in a plan then there is a corresponding
-delivery action in the same plan and vice versa. i.e. $u_i \in p_i
+delivery action in the same plan and vice-versa. i.e. $u_i \in p_i
 \leftrightarrow d_i \in p_i \ \forall_{p_i \in P,\  u_i \in p_i,\  d_i \in p_i}$
 \end{enumerate}
 
@@ -65,13 +64,31 @@ $$\sum_{v_i \in V} c_{v_i}$$
 
 \subsection{Initial solution}
 % Describe how you generate the initial solution %
+The initial solution is generated simply by giving all the tasks to the biggest
+vehicle.
 
 \subsection{Generating neighbours}
 % Describe how you generate neighbors %
+Two operators are used to generate neighbours:
+\begin{itemize}
+\item \textit{Changing vehicle}: give a pair of delivery and pickup tasks to
+  another vehicle by appending them to the plan of the other vehicle. Weight
+  constraints should not be violated by this change. 
+\item \textit{Changing task order}: change the order of two tasks in the plan of
+  a vehicle while making sure that the order does not violate constraint $3$;
+  namely the fact that a delivery task cannot come before the associated pickup
+  task.
+\end{itemize}
 
 \subsection{Stochastic optimization algorithm}
 % Describe your stochastic optimization algorithm %
-
+The algorithms works by first generating an initial solution that satisfies all
+the constraints. Then locally similar solutions are generated and the best one
+among them is chosen. This is repeated until a given number of iterations is
+reached. Since it uses an hill climbing heuristic, the algorithm is susceptible
+to getting stuck in a local minima and thus there is no guarantee of finding an
+optimal solution. To reduce the chances of getting stuck in a local minima,
+local improvements are only chosen with a certain probability.
 
 \section{Results}
 
