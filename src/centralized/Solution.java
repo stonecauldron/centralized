@@ -26,7 +26,7 @@ class Solution {
         this.plans = plans;
     }
 
-    private double p = 0.5;
+    private double p = 0.8;
 
 
     public ArrayList<Plan> getPlans(){
@@ -152,21 +152,7 @@ class Solution {
 
 
         if(Math.random() < this.p){
-            int rndId = (int)(Math.random()*neighbors.size());
-            int i = 0;
-            Solution tmp = null;
-            for(Solution s : neighbors){
-                if(i == rndId){
-                    tmp = s;
-                    break;
-                }
-                i++;
-            }
 
-            return tmp;
-
-        }
-        else {
             float minCost = neighbors.stream()
                     .min((x,y) -> (int) (Math.ceil(x.cost() - y.cost())))
                     .get()
@@ -179,9 +165,20 @@ class Solution {
             int randomIndex = (int) Math.floor(Math.random() * minCostCandidates.size());
 
             return minCostCandidates.get(randomIndex);
+        } else {
+            int rndId = (int)(Math.random()*neighbors.size());
+            int i = 0;
+            Solution tmp = null;
+            for(Solution s : neighbors){
+                if(i == rndId){
+                    tmp = s;
+                    break;
+                }
+                i++;
+            }
+
+            return tmp;
         }
-
-
     }
 
 

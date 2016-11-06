@@ -86,15 +86,20 @@ public class CentralizedAgent implements CentralizedBehavior {
             vehicleToPlan.put(p.getVehicle(),p.toLogistPlan());
         }
 
+        // metric for the total cost
+        float cost = 0f;
+
         List<Plan> result = new ArrayList<>();
         for(Vehicle v : vehicles){
             result.add(vehicleToPlan.get(v));
+            cost += vehicleToPlan.get(v).totalDistance() * v.costPerKm();
         }
 
 
         long time_end = System.currentTimeMillis();
         long duration = time_end - time_start;
         System.out.println("The plan was generated in " + duration + " milliseconds.");
+        System.out.println("The total cost of the plan was " + cost + " CHF");
 
         return result;
     }

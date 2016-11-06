@@ -92,25 +92,74 @@ local improvements are only chosen with a certain probability.
 
 \section{Results}
 
-\subsection{Experiment 1: Model parameters}
+\subsection{Experiment 1: Parameter $p$}
 % if your model has parameters, perform an experiment and analyze the results for different parameter values %
 
 \subsubsection{Setting}
 % Describe the settings of your experiment: topology, task configuration, number of tasks, number of vehicles, etc. %
 % and the parameters you are analyzing %
+\begin{itemize}
+\item Topology: England.
+\item Task distribution: uniform probability, constant reward and constant
+  weight.
+\item Task number: 30.
+\item Vehicles : 4 vehicles with all the same characteristics.
+\item $p \in \{0, 0.8, 1\}$
+\item Number of iterations: 20000.
+\end{itemize}
 
 \subsubsection{Observations}
 % Describe the experimental results and the conclusions you inferred from these results %
+\begin{itemize}
+\item With $p = 0$ the total cost of the plan is equal to: 58353.0 CHF. This can
+be explained by the fact that the solution is chosen in a completely random
+manner as long as it satisfies the constraints. It is thus far from being
+efficient.
 
-\subsection{Experiment 2: Different configurations}
+\item With $p = 0.8$ the total cost of the plan is equal to: 18518.0 CHF. This
+  is a much better result and it can easily explained by the fact that the
+  algorithm can now do an hill-ascent on the range of solutions.
+
+\item With $p = 1$ the total cost of the plan is equal to: 28943.6 CHF. The
+  higher cost can be explained by the fact that the algorithm will now almost
+  always converge to a local minimum since the random changes in the solution no
+  longer occur.
+\end{itemize}
+
+\subsection{Experiment 2: Different vehicle numbers}
 % Run simulations for different configurations of the environment (i.e. different tasks and number of vehicles) %
 
 \subsubsection{Setting}
 % Describe the settings of your experiment: topology, task configuration, number of tasks, number of vehicles, etc. %
+Same setting as experiment 1; the difference lies in the number of vehicles $N_V
+\in \{1, 4, 10\}$ and $p = 0.8$
 
 \subsubsection{Observations}
 % Describe the experimental results and the conclusions you inferred from these results %
 % Reflect on the fairness of the optimal plans. Observe that optimality requires some vehicles to do more work than others. %
 % How does the complexity of your algorithm depend on the number of vehicles and various sizes of the task set? %
-
+\begin{itemize}
+\item With $N_V = 1$ the total cost is equal to 28945.6 CHF. We get the same
+  result as in experiment 1 when $p = 1$. This can be understood by the fact
+  that the algorithm computes the best order of delivery when only one vehicle
+  is available.
+\item With $N_V = 4$ the total cost is equal to 18518.5 CHF. In this setting the
+  vehicles share the task set and as such can be more efficient than a lone
+  vehicle. This does not mean however that the tasks are distributed equally
+  since the only metric of performance is the total cost.
+\item With $N_V = 10$ the total cost is equal to 30237.5 CHF. We can see that
+  having more vehicles does not mean having a lower cost. In this setting many
+  vehicles do not even act for the whole duration of the simulation. This is
+  understandable by the fact that what is being optimized here is the total cost
+  and not the speed of delivery of all tasks.
+\end{itemize}
+The time complexity of the algorithm grows linearly with the number of vehicles
+present in the simulation and the number of tasks. This comes from the fact that
+the \textit{generateNeighbours} function has two operations:
+\begin{enumerate}
+\item Changing the order of tasks within the plan of a given vehicle. This
+  operation grows linearly with the number of tasks. 
+\item Giving a specific task to another vehicle. This grows linearly with the
+  number of vehicles to consider.
+\end{enumerate}
 \end{document}
