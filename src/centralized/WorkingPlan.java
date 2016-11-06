@@ -103,7 +103,7 @@ public class WorkingPlan {
                 accWeight -= currAction.getTask().weight;
             }
 
-            isValid = isValid & accWeight <= vehicle.capacity();
+            isValid = isValid && accWeight <= vehicle.capacity();
         }
 
 

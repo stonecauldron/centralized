@@ -163,9 +163,9 @@ class Plan implements Iterable<Action> {
             id++;
         }
 
-        // we have to choose the best modification with respect the following constraints :
-        // 1. the vehicle still carry out all tasks without capacity issues
-        // 2. the pickup of a given task T remains before the deliver of the same task T
+        // we have to choose the best modification with respect to the following constraints :
+        // 1. the vehicle can still carry out all tasks without capacity issues
+        // 2. the pickup of a particular task should always happen before its associated delivery
         // a modification is just an action we want to execute latter, or, sooner in the plan
 
         // working plan help to delay/advance an action
@@ -188,8 +188,8 @@ class Plan implements Iterable<Action> {
 
                 // so we have to find all positions in the plans with respect with our constraints
 
-                // we try to take our pickup sooner and sooner until done or until the capacity exceeded
-                // note : i begin to rewind 2 step before (not just 1) to avoid duplication
+                // we try to take our pickup sooner and sooner until done or until the capacity is exceeded
+                // note : I begin to rewind 2 steps before (not just 1) to avoid duplication
                 for(int toId = pickupTaskId.get(action1.getTask())-2; toId > 0; toId--){
 
                     workingPlan.setActionDisplacement(fromId,toId);
