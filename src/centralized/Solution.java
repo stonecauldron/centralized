@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A solution is represented by each vehicle having a dedicated plan
@@ -166,7 +167,18 @@ class Solution {
 
         }
         else {
-            return neighbors.stream().min((x,y)-> (int)(1000*(x.cost()-y.cost())) ).get();
+            float minCost = neighbors.stream()
+                    .min((x,y) -> (int) (Math.ceil(x.cost() - y.cost())))
+                    .get()
+                    .cost();
+
+            List<Solution> minCostCandidates = neighbors.stream()
+                    .filter(x -> x.cost() == minCost)
+                    .collect(Collectors.toList());
+
+            int randomIndex = (int) Math.floor(Math.random() * minCostCandidates.size());
+
+            return minCostCandidates.get(randomIndex);
         }
 
 
