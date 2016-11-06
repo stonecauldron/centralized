@@ -12,14 +12,18 @@ import logist.task.TaskSet;
 import logist.topology.Topology;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A very simple auction agent that assigns all tasks to its first vehicle and
  * handles them sequentially.
  */
-@SuppressWarnings("unused")
+
 public class CentralizedAgent implements CentralizedBehavior {
+
+
 
     private Topology topology;
     private TaskDistribution distribution;
@@ -27,8 +31,13 @@ public class CentralizedAgent implements CentralizedBehavior {
     private long timeout_setup;
     private long timeout_plan;
 
+
+
+
+
     @Override
-    public void setup(Topology topology, TaskDistribution distribution,
+    public void setup(Topology topology,
+                      TaskDistribution distribution,
                       Agent agent) {
 
         // this code is used to get the timeouts
@@ -49,25 +58,51 @@ public class CentralizedAgent implements CentralizedBehavior {
         this.agent = agent;
     }
 
+
+
+
+
+
     @Override
     public List<Plan> plan(List<Vehicle> vehicles, TaskSet tasks) {
+
         long time_start = System.currentTimeMillis();
 
-//		System.out.println("Agent " + agent.id() + " has tasks " + tasks);
-        Plan planVehicle1 = naivePlan(vehicles.get(0), tasks);
-
-        List<Plan> plans = new ArrayList<Plan>();
-        plans.add(planVehicle1);
-        while (plans.size() < vehicles.size()) {
-            plans.add(Plan.EMPTY);
+        Solution solution = null;
+        try {
+             solution = Solution.dummySolution(tasks,vehicles);
+        } catch (NoSolutionException e) {
+            e.printStackTrace();
         }
+
+        for(int i = 0; i<20000; i++){
+            solution = solution.localChoice(solution.generateNeighbours());
+        }
+
+
+        Map<Vehicle, Plan> vehicleToPlan = new HashMap<>();
+
+        for(centralized.Plan p : solution.getPlans()){
+            vehicleToPlan.put(p.getVehicle(),p.toLogistPlan());
+        }
+
+        List<Plan> result = new ArrayList<>();
+        for(Vehicle v : vehicles){
+            result.add(vehicleToPlan.get(v));
+        }
+
 
         long time_end = System.currentTimeMillis();
         long duration = time_end - time_start;
         System.out.println("The plan was generated in " + duration + " milliseconds.");
 
-        return plans;
+        return result;
     }
+
+
+
+
+
 
     private Plan naivePlan(Vehicle vehicle, TaskSet tasks) {
         Topology.City current = vehicle.getCurrentCity();
@@ -93,4 +128,9 @@ public class CentralizedAgent implements CentralizedBehavior {
         }
         return plan;
     }
+
+
+
+
+
 }
