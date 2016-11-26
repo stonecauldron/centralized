@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Random;
 
 /**
  * A solution is represented by each vehicle having a dedicated plan
@@ -34,34 +35,54 @@ class Solution {
     }
 
 
-
     public static Solution dummySolution(TaskSet tasks, List<Vehicle> vehicles) throws NoSolutionException {
 
-            if(tasks.isEmpty()){
-                return new Solution(new ArrayList<>());
+        if(tasks.isEmpty()){
+            return new Solution(new ArrayList<>());
+        }
+
+        if(vehicles.isEmpty()){
+            throw new NoSolutionException("existing task to deliver without any vehicle");
+        }
+
+        ArrayList<Plan> plans = new ArrayList<>(
+                vehicles.stream()
+                        .map(Plan::new)
+                        .collect(Collectors.toList()));
+
+        Plan planWithHighestCapacity = plans.stream()
+                .min((v1, v2) -> v1.getVehicle().capacity() - v2.getVehicle().capacity()).get();
+        int indexOfHighestCapacityPlan = plans.indexOf(planWithHighestCapacity);
+
+        // we assign each task to a random vehicle
+        for (Task t : tasks) {
+            int randomIndex = new Random().nextInt(plans.size());
+            Plan randomVehiclePlan = plans.get(randomIndex);
+
+            if (t.weight > randomVehiclePlan.getVehicle().capacity()) {
+
+                planWithHighestCapacity = plans.get(indexOfHighestCapacityPlan);
+                // put it into largest vehicle
+                planWithHighestCapacity = planWithHighestCapacity.add(planWithHighestCapacity.size(),
+                        new Action(t.pickupCity, ActionType.PICKUP, t));
+
+                planWithHighestCapacity = planWithHighestCapacity = planWithHighestCapacity.add(planWithHighestCapacity.size(),
+                        new Action(t.deliveryCity, ActionType.DELIVERY, t));
+
+                plans.set(indexOfHighestCapacityPlan, planWithHighestCapacity);
+
+            } else {
+
+
+                randomVehiclePlan = randomVehiclePlan.add(randomVehiclePlan.size(),
+                        new Action(t.pickupCity, ActionType.PICKUP, t));
+
+                randomVehiclePlan = randomVehiclePlan.add(randomVehiclePlan.size(),
+                        new Action(t.deliveryCity, ActionType.DELIVERY, t));
+
+                plans.set(randomIndex, randomVehiclePlan);
             }
-
-            if(vehicles.isEmpty()){
-                throw new NoSolutionException("existing task to deliver without any vehicle");
-            }
-
-            // otherwise we create our first dummy plan (the best vehicle do all the job)
-
-            Vehicle maxCapacityVehicle = vehicles.stream().min((v1, v2)->v1.capacity()-v2.capacity()).get();
-            Plan plan = new Plan(maxCapacityVehicle);
-
-            for(Task t : tasks){
-                if(t.weight>maxCapacityVehicle.capacity()){
-                    throw new NoSolutionException("a task has a weight too high for any of our vehicles");
-                }
-                plan = plan.add(plan.size(), new Action(t.pickupCity,ActionType.PICKUP,t));
-                plan = plan.add(plan.size(), new Action(t.deliveryCity,ActionType.DELIVERY,t));
-            }
-
-            ArrayList<Plan> plans = new ArrayList<>();
-            for(Vehicle v : vehicles){
-                plans.add( v != maxCapacityVehicle ? new Plan(v) : plan);
-            }
+        }
 
         return new Solution(plans);
     }
